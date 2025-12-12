@@ -1,11 +1,10 @@
-using library_api.Application;
+﻿using library_api.Application;
 using library_api.Infrastructure;
 using library_api.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 var currentDir = Directory.GetCurrentDirectory();
 var envPath = Path.Combine(currentDir, ".env");
@@ -29,18 +28,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// 🔥 CORS corregido — funciona con cualquier frontend (Live Server incluido)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy
+            .AllowAnyOrigin()    // Permite tu frontend https://127.0.0.1:5500
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
-builder.Services.AddApplication();   
-builder.Services.AddInfrastructure();   
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
@@ -50,6 +51,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// 🔥 MUY IMPORTANTE → CORS debe ir ANTES de Routing y Controllers
 app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
